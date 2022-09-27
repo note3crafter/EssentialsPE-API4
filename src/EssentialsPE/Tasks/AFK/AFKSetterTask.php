@@ -8,11 +8,12 @@ use EssentialsPE\BaseFiles\BaseTask;
 use EssentialsPE\BaseFiles\BaseAPI;
 use pocketmine\utils\TextFormat;
 
-class AFKSetterTask extends BaseTask{
+class AFKSetterTask extends BaseTask {
 
     /**
      * @param BaseAPI $api
      */
+
     public function __construct(BaseAPI $api){
         parent::__construct($api);
     }
@@ -27,10 +28,7 @@ class AFKSetterTask extends BaseTask{
      * If so, they will be set in AFK mode
      */
 
-    /**
-     * @param int $currentTick
-     */
-    public function onRun(int $currentTick): void{
+    public function onRun() : void {
         $this->getAPI()->getServer()->getLogger()->debug(TextFormat::YELLOW . "Running EssentialsPE's AFKSetterTask");
         foreach($this->getAPI()->getServer()->getOnlinePlayers() as $p){
             if(!$this->getAPI()->isAFK($p) && ($last = $this->getAPI()->getLastPlayerMovement($p)) !== null && !$p->hasPermission("essentials.afk.preventauto")){

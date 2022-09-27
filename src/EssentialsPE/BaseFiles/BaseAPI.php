@@ -207,7 +207,8 @@ class BaseAPI{
      * @param Player $player
      * @return bool
      */
-    public function isAFK(Player $player): bool{
+
+    public function isAFK(Player $player) : bool{
         return $this->getSession($player)->isAFK();
     }
 
@@ -247,6 +248,7 @@ class BaseAPI{
      * @param Player $player
      * @param bool $broadcast
      */
+
     public function switchAFKMode(Player $player, bool $broadcast = true): void{
         $this->setAFKMode($player, !$this->isAFK($player), $broadcast);
     }
@@ -256,6 +258,7 @@ class BaseAPI{
      *
      * This function schedules the global Auto-AFK setter
      */
+    
     public function scheduleAutoAFKSetter(): void{
         if(is_int($v = $this->getEssentialsPEPlugin()->getConfig()->getNested("afk.auto-set")) && $v > 0){
             $this->getEssentialsPEPlugin()->getScheduler()->scheduleDelayedTask(new AFKSetterTask($this), 600); // Check every 30 seconds...

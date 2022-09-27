@@ -6,90 +6,101 @@ namespace EssentialsPE;
 
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Commands\AFK;
-use EssentialsPE\Commands\Antioch;
-use EssentialsPE\Commands\Back;
-use EssentialsPE\Commands\BreakCommand;
-use EssentialsPE\Commands\Broadcast;
-use EssentialsPE\Commands\Burn;
-use EssentialsPE\Commands\ClearInventory;
-use EssentialsPE\Commands\Compass;
-use EssentialsPE\Commands\Condense;
-use EssentialsPE\Commands\Depth;
-use EssentialsPE\Commands\Feed;
-use EssentialsPE\Commands\Extinguish;
-use EssentialsPE\Commands\Fly;
-use EssentialsPE\Commands\GetPos;
-use EssentialsPE\Commands\God;
-use EssentialsPE\Commands\Heal;
-use EssentialsPE\Commands\Home\DelHome;
-use EssentialsPE\Commands\Home\Home;
-use EssentialsPE\Commands\Home\SetHome;
-use EssentialsPE\Commands\ItemCommand;
-use EssentialsPE\Commands\ItemDB;
-use EssentialsPE\Commands\Jump;
-use EssentialsPE\Commands\KickAll;
-use EssentialsPE\Commands\Lightning;
-use EssentialsPE\Commands\More;
-use EssentialsPE\Commands\Mute;
-use EssentialsPE\Commands\Near;
-use EssentialsPE\Commands\Nick;
-use EssentialsPE\Commands\Nuke;
-use EssentialsPE\Commands\Override\Gamemode;
-use EssentialsPE\Commands\Override\Kill;
-use EssentialsPE\Commands\Override\Msg;
-use EssentialsPE\Commands\Ping;
-use EssentialsPE\Commands\PowerTool\PowerTool;
-use EssentialsPE\Commands\PowerTool\PowerToolToggle;
-use EssentialsPE\Commands\PTime;
-use EssentialsPE\Commands\PvP;
-use EssentialsPE\Commands\RealName;
-use EssentialsPE\Commands\Repair;
-use EssentialsPE\Commands\Reply;
-use EssentialsPE\Commands\Seen;
-use EssentialsPE\Commands\SetSpawn;
-use EssentialsPE\Commands\Spawn;
-use EssentialsPE\Commands\Speed;
-use EssentialsPE\Commands\Sudo;
-use EssentialsPE\Commands\Suicide;
-use EssentialsPE\Commands\Teleport\TPA;
-use EssentialsPE\Commands\Teleport\TPAccept;
-use EssentialsPE\Commands\Teleport\TPAHere;
-use EssentialsPE\Commands\Teleport\TPAll;
-use EssentialsPE\Commands\Teleport\TPDeny;
-use EssentialsPE\Commands\Teleport\TPHere;
-use EssentialsPE\Commands\TempBan;
-use EssentialsPE\Commands\Top;
-use EssentialsPE\Commands\Unlimited;
-use EssentialsPE\Commands\Vanish;
-use EssentialsPE\Commands\Warp\DelWarp;
-use EssentialsPE\Commands\Warp\Setwarp;
-use EssentialsPE\Commands\Warp\Warp;
-use EssentialsPE\Commands\Whois;
-use EssentialsPE\Commands\World;
-use EssentialsPE\EventHandlers\OtherEvents;
-use EssentialsPE\EventHandlers\PlayerEvents;
-use EssentialsPE\EventHandlers\SignEvents;
+
+use EssentialsPE\Commands\{
+    AFK,
+    Antioch,
+    Back,
+    BreakCommand,
+    Broadcast,
+    Burn,
+    ClearInventory,
+    Compass,
+    Condense,
+    Depth,
+    Feed,
+    Extinguish,
+    Fly,
+    GetPos,
+    God,
+    Heal,
+    Home\DelHome,
+    Home\Home,
+    Home\SetHome,
+    ItemCommand,
+    ItemDB,
+    Jump,
+    KickAll,
+    Lightning,
+    More,
+    Mute,
+    Near,
+    Nick,
+    Nuke,
+    Override\Gamemode,
+    Override\Kill,
+    Override\Msg,
+    Ping,
+    PowerTool\PowerTool,
+    PowerTool\PowerToolToggle,
+    PTime,
+    PvP,
+    RealName,
+    Repair,
+    Reply,
+    Seen,
+    SetSpawn,
+    Spawn,
+    Speed,
+    Sudo,
+    Suicide,
+    TempBan,
+    Top,
+    Unlimited,
+    Vanish,
+    Warp\DelWarp,
+    Warp\Setwarp,
+    Warp\Warp,
+    Whois,
+    World
+};
+
+use EssentialsPE\Commands\Teleport\{
+    TPAccept,
+    TPAHere,
+    TPAll,
+    TPDeny,
+    TPAHere
+};
+
+use EssentialsPE\EventHandlers\{
+    OtherEvents,
+    PlayerEvents,
+    SignEvents
+};
+
 use EssentialsPE\Events\CreateAPIEvent;
-use JackMD\UpdateNotifier\UpdateNotifier;
+
 use pocketmine\plugin\PluginBase;
+
 use pocketmine\utils\TextFormat;
+
+use JackMD\UpdateNotifier\UpdateNotifier;
 
 class Loader extends PluginBase{
 
     /** @var BaseAPI */
-    private $api;
+    private BaseAPI $api;
     /** @var string */
     private const version = "0.0.4";
 
-	public function onLoad(): void{
+	public function onLoad() : void {
 		// Before anything else...
 		$this->checkConfig();
-
 		UpdateNotifier::checkUpdate($this, $this->getDescription()->getName(), $this->getDescription()->getVersion());
 	}
 
-    public function onEnable(): void{
+    public function onEnable() : void {
         // Custom API Setup :3
         $ev = new CreateAPIEvent($this, BaseAPI::class);
 	    try{
@@ -114,7 +125,7 @@ class Loader extends PluginBase{
         $this->getAPI()->scheduleAutoAFKSetter();
     }
 
-    public function onDisable(): void{
+    public function onDisable() : void {
         if(count($l = $this->getServer()->getOnlinePlayers()) > 0){
             $this->getAPI()->removeSession($l);
         }
@@ -124,7 +135,7 @@ class Loader extends PluginBase{
     /**
      * Function to register all the Event Handlers that EssentialsPE provide
      */
-    public function registerEvents(): void{
+    public function registerEvents() : void {
         $this->getServer()->getPluginManager()->registerEvents(new OtherEvents($this->getAPI()), $this);
         $this->getServer()->getPluginManager()->registerEvents(new PlayerEvents($this->getAPI()), $this);
         $this->getServer()->getPluginManager()->registerEvents(new SignEvents($this->getAPI()), $this);
