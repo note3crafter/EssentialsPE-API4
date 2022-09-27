@@ -15,7 +15,7 @@ class OtherEvents extends BaseEventHandler{
     /**
      * @param CommandEvent $event
      */
-    public function onServerCommand(CommandEvent $event): void{
+    public function onServerCommand(CommandEvent $event) : void {
         $command = $this->getAPI()->colorMessage($event->getCommand());
         if($command === false){
             $event->cancel();
