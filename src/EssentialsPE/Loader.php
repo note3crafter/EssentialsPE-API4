@@ -54,12 +54,6 @@ use EssentialsPE\Commands\{
     Speed,
     Sudo,
     Suicide,
-    Teleport\TPA,
-    Teleport\TPAccept,
-    Teleport\TPAHere,
-    Teleport\TPAll,
-    Teleport\TPDeny,
-    Teleport\TPAHere,
     TempBan,
     Top,
     Unlimited,
@@ -69,6 +63,15 @@ use EssentialsPE\Commands\{
     Warp\Warp,
     Whois,
     World
+};
+
+use EssentialsPE\Commands\Teleport{
+    TPA,
+    TPAccept,
+    TPAHere,
+    TPAll,
+    TPDeny,
+    TPAHere
 };
 
 use EssentialsPE\EventHandlers\{
