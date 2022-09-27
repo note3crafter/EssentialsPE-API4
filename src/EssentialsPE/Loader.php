@@ -65,7 +65,7 @@ use EssentialsPE\Commands\{
     World
 };
 
-use EssentialsPE\Commands\Teleport{
+use EssentialsPE\Commands\Teleport\{
     TPA,
     TPAccept,
     TPAHere,
