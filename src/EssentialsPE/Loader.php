@@ -66,7 +66,6 @@ use EssentialsPE\Commands\{
 };
 
 use EssentialsPE\Commands\Teleport\{
-    TPA,
     TPAccept,
     TPAHere,
     TPAll,
