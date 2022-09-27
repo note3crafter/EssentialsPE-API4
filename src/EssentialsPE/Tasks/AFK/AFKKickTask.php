@@ -6,7 +6,7 @@ namespace EssentialsPE\Tasks\AFK;
 
 use EssentialsPE\BaseFiles\BaseTask;
 use EssentialsPE\BaseFiles\BaseAPI;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class AFKKickTask extends BaseTask{

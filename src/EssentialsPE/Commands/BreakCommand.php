@@ -7,9 +7,9 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\block\Air;
-use pocketmine\block\Block;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class BreakCommand extends BaseCommand{
@@ -35,14 +35,14 @@ class BreakCommand extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(($block = $sender->getTargetBlock(100, [Block::AIR])) === null){
+        if(($block = $sender->getTargetBlock(100, [BlockLegacyIds::AIR])) === null){
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");
             return false;
-        }elseif($block->getId() === Block::BEDROCK && !$sender->hasPermission("essentials.break.bedrock")){
+        }elseif($block->getId() === BlockLegacyIds::BEDROCK && !$sender->hasPermission("essentials.break.bedrock")){
             $sender->sendMessage(TextFormat::RED . "You can't break bedrock");
             return false;
         }
-        $sender->getLevel()->setBlock($block, new Air(), true, true);
+        $sender->getWorld()->setBlock($block, new Air(), true, true);
         return true;
     }
 } 

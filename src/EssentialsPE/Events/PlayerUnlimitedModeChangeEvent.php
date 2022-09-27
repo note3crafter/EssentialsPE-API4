@@ -7,7 +7,7 @@ namespace EssentialsPE\Events;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCustomEvent;
 use pocketmine\event\Cancellable;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class PlayerUnlimitedModeChangeEvent extends BaseCustomEvent implements Cancellable{
     public static $handlerList = null;

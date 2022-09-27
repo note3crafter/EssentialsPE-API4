@@ -6,12 +6,17 @@ namespace EssentialsPE\Commands;
 
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use pocketmine\block\Sapling;
+use pocketmine\block\BrownMushroom;
+use pocketmine\block\RedMushroom;
 use pocketmine\command\CommandSender;
-use pocketmine\level\generator\object\Tree;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\Random;
 use pocketmine\utils\TextFormat;
+use pocketmine\world\generator\object\BirchTree;
+use pocketmine\world\generator\object\JungleTree;
+use pocketmine\world\generator\object\OakTree;
+use pocketmine\world\generator\object\SpruceTree;
+use TheNote\core\server\generators\normal\object\SwampTree;
 
 class TreeCommand extends BaseCommand{
     /**
@@ -36,36 +41,34 @@ class TreeCommand extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $block = $sender->getTargetBlock(100, BaseAPI::NON_SOLID_BLOCKS);
-        if($block === null){
+        $object = $sender->getTargetBlock(100, BaseAPI::NON_SOLID_BLOCKS);
+        if($object === null){
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");
             return false;
         }
-        switch(strtolower($args[0])){
+        $object = null;
+        switch (strtolower($args[0])) {
             case "oak":
-            default:
-                $type = Sapling::OAK;
+                $object = new OakTree;
                 break;
             case "birch":
-                $type = Sapling::BIRCH;
-                break;
-            case "redwood":
-                $type = Sapling::SPRUCE;
+                $object = new BirchTree;
                 break;
             case "jungle":
-                $type = Sapling::JUNGLE;
+                $object = new JungleTree;
                 break;
-            /*case "redmushroom":
-                $type = Sapling::RED_MUSHROOM;
+            case "spruce":
+                $object = new SpruceTree();
+                break;
+            case "redmushroom":
+                $object = new RedMushroom();
                 break;
             case "brownmushroom":
-                $type = Sapling::BROWN_MUSHROOM;
+                $object = new BrownMushroom();
                 break;
-            case "swamp":
-                $type = Sapling::SWAMP;
-                break;*/
         }
-        Tree::growTree($sender->getLevel(), $block->x, $block->y+1, $block->z, new Random(mt_rand()), $type & 0x07);
+        $object->getBlockTransaction($sender->getWorld(), $sender->getPosition()->getFloorX(), $sender->getPosition()->getFloorY(), $sender->getPosition()->getFloorZ(), new Random())?->apply();
         return true;
+
     }
 } 

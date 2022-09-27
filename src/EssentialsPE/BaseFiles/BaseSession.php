@@ -6,8 +6,9 @@ namespace EssentialsPE\BaseFiles;
 
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
-use pocketmine\level\Location;
-use pocketmine\Player;
+
+use pocketmine\entity\Location;
+use pocketmine\player\Player;
 use pocketmine\utils\Config;
 
 class BaseSession{
@@ -293,11 +294,11 @@ class BaseSession{
         $homes = [];
         foreach($this->homes as $name => $values){
             if(is_array($values) && count($values) > 1){
-                if($this->getPlugin()->getServer()->isLevelGenerated($values[3])){
-                    if(!$this->getPlugin()->getServer()->isLevelLoaded($values[3])){
-                        $this->getPlugin()->getServer()->loadLevel($values[3]);
+                if($this->getPlugin()->getServer()->getWorldManager()->isWorldGenerated($values[3])){
+                    if(!$this->getPlugin()->getServer()->getWorldManager()->isWorldLoaded($values[3])){
+                        $this->getPlugin()->getServer()->getWorldManager()->loadWorld($values[3]);
                     }
-                    $homes[$name] = new BaseLocation((string) $name, (int) $values[0], (int) $values[1], (int) $values[2], $this->getPlugin()->getServer()->getLevelByName($values[3]), $values[4], $values[5]);
+                    $homes[$name] = new BaseLocation((string) $name, (int) $values[0], (int) $values[1], (int) $values[2], $this->getPlugin()->getServer()->getWorldManager()->getWorldByName($values[3]), $values[4], $values[5]);
                 }
             }
         }

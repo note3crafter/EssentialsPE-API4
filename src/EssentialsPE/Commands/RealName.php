@@ -36,7 +36,7 @@ class RealName extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }
-        $sender->sendMessage(TextFormat::YELLOW .  $player->getDisplayName() . (substr($player->getName(), -1, 1) === "s" ? "'" : "'s") . " realname is: " . TextFormat::RED . $player->getName());
+        $sender->sendMessage(TextFormat::YELLOW .  $player->getDisplayName() . (str_ends_with($player->getName(), "s") ? "'" : "'s") . " realname is: " . TextFormat::RED . $player->getName());
         return true;
     }
 }

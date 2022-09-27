@@ -9,7 +9,7 @@ use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\block\Sapling;
 use pocketmine\command\CommandSender;
 use pocketmine\level\generator\object\BigTree;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class BigTreeCommand extends BaseCommand{

@@ -7,8 +7,9 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\item\Item;
-use pocketmine\Player;
+use pocketmine\item\ItemIds;
+use pocketmine\player\GameMode;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class More extends BaseCommand{
@@ -34,12 +35,12 @@ class More extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(($gm = $sender->getGamemode()) === Player::CREATIVE || $gm === Player::SPECTATOR){
-            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getAPI()->getServer()->getGamemodeString($gm) . " mode");
+        if(($gm = $sender->getGamemode()) === GameMode::CREATIVE() || $gm === GameMode::SPECTATOR()){
+            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $gm . " mode");
             return false;
         }
         $item = $sender->getInventory()->getItemInHand();
-        if($item->getId() === Item::AIR){
+        if($item->getId() === ItemIds::AIR){
             $sender->sendMessage(TextFormat::RED . "You can't get a stack of AIR");
             return false;
         }

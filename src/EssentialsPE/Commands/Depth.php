@@ -7,7 +7,7 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class Depth extends BaseCommand{
@@ -33,7 +33,7 @@ class Depth extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $sender->sendMessage(TextFormat::AQUA . "You're " . (($pos = $sender->getFloorY() - 63) === 0 ? "at" : (abs($pos) . " meters " . ($pos > 0 ? "above" : "below"))) . " the sea level.");
+        $sender->sendMessage(TextFormat::AQUA . "You're " . (($pos = $sender->getPosition()->getFloorY() - 63) === 0 ? "at" : (abs($pos) . " meters " . ($pos > 0 ? "above" : "below"))) . " the sea level.");
         return true;
     }
 }

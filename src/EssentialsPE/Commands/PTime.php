@@ -7,9 +7,9 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\level\Level;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use pocketmine\utils\Timezone;
 
 class PTime extends BaseCommand{
     /**
@@ -40,20 +40,23 @@ class PTime extends BaseCommand{
             switch($time){
                 case "dawn":
                 case "sunrise":
-                    $time = Level::TIME_SUNRISE;
+                    $time = 23000;
                     break;
                 case "day":
-                    $time = Level::TIME_DAY;
+                    $time = 1000;
                     break;
                 case "noon":
                     $time = 6000;
                     break;
                 case "evening":
                 case "sunset":
-                    $time = Level::TIME_SUNSET;
+                    $time = 1200;
                     break;
                 case "night":
-                    $time = Level::TIME_NIGHT;
+                    $time = 13000;
+                    break;
+                case "midnight":
+                    $time = 18000;
                     break;
             }
         }

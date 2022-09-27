@@ -8,9 +8,10 @@ use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\event\entity\EntityRegainHealthEvent;
-use pocketmine\level\particle\HeartParticle;
-use pocketmine\Player;
+use pocketmine\math\Vector3;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use pocketmine\world\particle\HeartParticle;
 
 class Heal extends BaseCommand{
     /**
@@ -45,7 +46,11 @@ class Heal extends BaseCommand{
         	return false;
         }
         $player->heal(new EntityRegainHealthEvent($player, $player->getMaxHealth() - $player->getHealth(), EntityRegainHealthEvent::CAUSE_CUSTOM));
-        $player->getLevel()->addParticle(new HeartParticle($player->add(0, 2), 4));
+        $x = $player->getLocation()->getX();
+        $y = $player->getLocation()->getY();
+        $z = $player->getLocation()->getZ();
+        $player->setHealth(20);
+        $player->getWorld()->addParticle(new Vector3($x, $y, $z),new HeartParticle);
         $player->sendMessage(TextFormat::GREEN . "You have been healed!");
         if($player !== $sender){
             $sender->sendMessage(TextFormat::GREEN . $player->getDisplayName() . " has been healed!");

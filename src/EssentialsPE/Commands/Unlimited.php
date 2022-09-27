@@ -7,7 +7,8 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\GameMode;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class Unlimited extends BaseCommand{
@@ -43,8 +44,8 @@ class Unlimited extends BaseCommand{
                 return false;
             }
         }
-        if(($gm = $player->getGamemode()) === Player::CREATIVE || $gm === Player::SPECTATOR){
-            $sender->sendMessage(TextFormat::RED . "[Error] " . ($player === $sender ? "you are" : $player->getDisplayName() . " is") . " in " . $this->getAPI()->getServer()->getGamemodeString($gm) . " mode");
+        if(($gm = $player->getGamemode()) === GameMode::CREATIVE() || $gm === Gamemode::SPECTATOR()){
+            $sender->sendMessage(TextFormat::RED . "[Error] " . ($player === $sender ? "you are" : $player->getDisplayName() . " is") . " in " . $gm . " mode");
             return false;
         }
         $this->getAPI()->switchUnlimited($player);

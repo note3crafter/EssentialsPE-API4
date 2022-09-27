@@ -3,8 +3,6 @@
 declare(strict_types = 1);
 
 namespace EssentialsPE\Commands;
-
-
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;

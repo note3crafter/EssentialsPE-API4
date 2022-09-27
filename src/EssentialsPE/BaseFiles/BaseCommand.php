@@ -4,12 +4,11 @@ namespace EssentialsPE\BaseFiles;
 use EssentialsPE\Loader;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat;
 
-abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
+abstract class BaseCommand extends Command {
     /** @var BaseAPI  */
     private $api;
     /** @var bool|string */

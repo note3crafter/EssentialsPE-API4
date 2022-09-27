@@ -7,7 +7,7 @@ namespace EssentialsPE\Commands\Override;
 use EssentialsPE\BaseFiles\BaseAPI;
 use pocketmine\command\CommandSender;
 use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class Kill extends BaseOverrideCommand{

@@ -7,7 +7,7 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class Jump extends BaseCommand{
@@ -38,11 +38,11 @@ class Jump extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");
             return false;
         }
-        if(!$sender->getLevel()->getBlock($block->add(0, 2))->isSolid()){
-            $sender->teleport($block->add(0, 1));
+        if(!$sender->getWorld()->getBlock($block->getPosition()->add(0, 2, 0))->isSolid()){
+            $sender->teleport($block->getPosition()->add(0, 1, 0) );
             return true;
         }
-        switch($side = $sender->getDirection()){
+        switch($side = $sender->getDirectionVector()){
             case 0:
             case 1:
                 $side += 3;

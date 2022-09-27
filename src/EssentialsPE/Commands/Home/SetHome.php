@@ -7,7 +7,7 @@ namespace EssentialsPE\Commands\Home;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class SetHome extends BaseCommand{
@@ -40,7 +40,7 @@ class SetHome extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] Please provide a Home name");
             return false;
         }
-        if(!$this->getAPI()->setHome($sender, strtolower($args[0]), $sender->getLocation(), $sender->getYaw(), $sender->getPitch())){
+        if(!$this->getAPI()->setHome($sender, strtolower($args[0]), $sender->getLocation(), $sender->getPosition()->getYaw(), $sender->getPosition()->getPitch())){
             $sender->sendMessage(TextFormat::RED . "Invalid home name given! Please be sure to only use alphanumerical characters and underscores");
             return false;
         }

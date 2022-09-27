@@ -5,12 +5,12 @@ declare(strict_types = 1);
 namespace EssentialsPE\EventHandlers;
 
 use EssentialsPE\BaseFiles\BaseEventHandler;
+use pocketmine\block\tile\Sign;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\SignChangeEvent;
 use pocketmine\event\entity\EntityRegainHealthEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\math\Vector3;
-use pocketmine\tile\Sign;
 use pocketmine\utils\TextFormat;
 
 class SignEvents extends BaseEventHandler{
@@ -19,11 +19,11 @@ class SignEvents extends BaseEventHandler{
 	 * @throws \ReflectionException
 	 */
     public function onSignTap(PlayerInteractEvent $event): void{
-        $tile = $event->getBlock()->getLevel()->getTile(new Vector3($event->getBlock()->getFloorX(), $event->getBlock()->getFloorY(), $event->getBlock()->getFloorZ()));
+        $tile = $event->getBlock()->getPosition()->getWorld()->getTile(new Vector3($event->getBlock()->getPosition()->getFloorX(), $event->getBlock()->getPosition()->getFloorY(), $event->getBlock()->getPosition()->getFloorZ()));
         if($tile instanceof Sign){
             // Free sign
             if(TextFormat::clean($tile->getText()[0], true) === "[Free]"){
-                $event->setCancelled(true);
+                $event->cancel();
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.free")){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
                }else{
@@ -44,7 +44,7 @@ class SignEvents extends BaseEventHandler{
 
             // Gamemode sign
             elseif(TextFormat::clean($tile->getText()[0], true) === "[Gamemode]"){
-                $event->setCancelled(true);
+                $event->cancel();
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.gamemode")){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
                }else{
@@ -64,7 +64,7 @@ class SignEvents extends BaseEventHandler{
 
             // Heal sign
             elseif(TextFormat::clean($tile->getText()[0], true) === "[Heal]"){
-                $event->setCancelled(true);
+                $event->cancel();
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.heal")){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
                 }elseif($event->getPlayer()->getGamemode() === 1 || $event->getPlayer()->getGamemode() === 3){
@@ -78,7 +78,7 @@ class SignEvents extends BaseEventHandler{
 
             // Repair sign
             elseif(TextFormat::clean($tile->getText()[0], true) === "[Repair]"){
-                $event->setCancelled(true);
+                $event->cancel();
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.repair")){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
                 }elseif($event->getPlayer()->getGamemode() === 1 || $event->getPlayer()->getGamemode() === 3){
@@ -118,15 +118,15 @@ class SignEvents extends BaseEventHandler{
 
             // Time sign
             elseif(TextFormat::clean($tile->getText()[0], true) === "[Time]"){
-                $event->setCancelled(true);
+                $event->cancel();
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.time")){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
                }else{
                     if(($v = $tile->getText()[1]) === "Day"){
-                        $event->getPlayer()->getLevel()->setTime(0);
+                        $event->getPlayer()->getWorld()->setTime(0);
                         $event->getPlayer()->sendMessage(TextFormat::GREEN . "Time set to \"Day\"" . TextFormat::GREEN);
                     }elseif($v === "Night"){
-                        $event->getPlayer()->getLevel()->setTime(12500);
+                        $event->getPlayer()->getWorld()->setTime(12500);
                         $event->getPlayer()->sendMessage(TextFormat::GREEN . "Time set to \"Night\"" . TextFormat::GREEN);
                     }
                 }
@@ -134,7 +134,7 @@ class SignEvents extends BaseEventHandler{
 
             // Teleport sign
             elseif(TextFormat::clean($tile->getText()[0], true) === "[Teleport]"){
-                $event->setCancelled(true);
+                $event->cancel();
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.teleport")){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
                }else{
@@ -145,7 +145,7 @@ class SignEvents extends BaseEventHandler{
 
             // Warp sign
             elseif(TextFormat::clean($tile->getText()[0], true) === "[Warp]" && $this->getAPI()->getEssentialsPEPlugin()->getServer()->getPluginManager()->getPlugin("SimpleWarp") === null && $this->getAPI()->getEssentialsPEPlugin()->getConfig()->get("warps") === true){
-                $event->setCancelled(true);
+                $event->cancel();
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.warp")){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
                }else{
@@ -171,12 +171,12 @@ class SignEvents extends BaseEventHandler{
      * @priority HIGH
      */
     public function onBlockBreak(BlockBreakEvent $event): void{
-        $tile = $event->getBlock()->getLevel()->getTile(new Vector3($event->getBlock()->getFloorX(), $event->getBlock()->getFloorY(), $event->getBlock()->getFloorZ()));
+        $tile = $event->getBlock()->getPosition()->getWorld()->getTile(new Vector3($event->getBlock()->getPosition()->getFloorX(), $event->getBlock()->getPosition()->getFloorY(), $event->getBlock()->getPosition()->getFloorZ()));
         if($tile instanceof Sign){
             $key = ["Free", "Gamemode", "Heal", "Repair", "Time", "Teleport", "Warp"];
             foreach($key as $k){
                 if(TextFormat::clean($tile->getText()[0], true) === "[" . $k . "]" && !$event->getPlayer()->hasPermission("essentials.sign.break." . strtolower($k))){
-                    $event->setCancelled(true);
+                    $event->cancel();
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to break this sign");
                     break;
                 }
@@ -205,7 +205,7 @@ class SignEvents extends BaseEventHandler{
 
                 if($item->getId() === 0 || $item->getName() === "Air"){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Invalid item name/ID");
-                    $event->setCancelled(true);
+                    $event->cancel();
                 }else{
                     $event->getPlayer()->sendMessage(TextFormat::GREEN . "Free sign successfully created!");
                     $event->setLine(0, TextFormat::AQUA . "[Free]");
@@ -214,7 +214,7 @@ class SignEvents extends BaseEventHandler{
                 }
             }else{
                 $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] You should provide an item name/ID");
-                $event->setCancelled(true);
+                $event->cancel();
             }
         }
 
@@ -282,7 +282,7 @@ class SignEvents extends BaseEventHandler{
                     break;
                 default:
                     $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Invalid time, you should use \"Day\" or \"Night\"");
-                    $event->setCancelled(true);
+                    $event->cancel();
                     return;
             }
             $event->getPlayer()->sendMessage(TextFormat::GREEN . "Time sign successfully created!");
@@ -293,13 +293,13 @@ class SignEvents extends BaseEventHandler{
         elseif(strtolower(TextFormat::clean($event->getLine(0), true)) === "[teleport]" && $event->getPlayer()->hasPermission("essentials.sign.create.teleport")){
             if(!is_numeric($event->getLine(1))){
                 $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Invalid X position, Teleport sign will not work");
-                $event->setCancelled(true);
+                $event->cancel();
             }elseif(!is_numeric($event->getLine(2))){
                 $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Invalid Y position, Teleport sign will not work");
-                $event->setCancelled(true);
+                $event->cancel();
             }elseif(!is_numeric($event->getLine(3))){
                 $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Invalid Z position, Teleport sign will not work");
-                $event->setCancelled(true);
+                $event->cancel();
             }else{
                 $event->getPlayer()->sendMessage(TextFormat::GREEN . "Teleport sign successfully created!");
                 $event->setLine(0, TextFormat::AQUA . "[Teleport]");
@@ -314,7 +314,7 @@ class SignEvents extends BaseEventHandler{
             $warp = $event->getLine(1);
             if(!$this->getAPI()->warpExists($warp)){
                 $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Warp doesn't exists");
-                $event->setCancelled(true);
+                $event->cancel();
             }else{
                 $event->getPlayer()->sendMessage(TextFormat::GREEN . "Warp sign successfully created!");
                 $event->setLine(0, TextFormat::AQUA . "[Warp]");

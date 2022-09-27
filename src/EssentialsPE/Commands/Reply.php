@@ -7,9 +7,8 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\command\ConsoleCommandSender;
-use pocketmine\command\RemoteConsoleCommandSender;
-use pocketmine\Player;
+use pocketmine\console\ConsoleCommandSender;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class Reply extends BaseCommand{
@@ -53,7 +52,7 @@ class Reply extends BaseCommand{
         }else{
             $this->getPlugin()->getLogger()->info($m);
         }
-        $this->getAPI()->setQuickReply(($t instanceof Player ? $t : ($t === "console" ? new ConsoleCommandSender() : new RemoteConsoleCommandSender())), $sender);
+        $this->getAPI()->setQuickReply(($t instanceof Player ? $t : ($t === "console" ?? new ConsoleCommandSender())), $sender);
         return true;
     }
 }

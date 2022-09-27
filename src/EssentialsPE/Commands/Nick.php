@@ -7,7 +7,7 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class Nick extends BaseCommand{
@@ -53,7 +53,7 @@ class Nick extends BaseCommand{
         }
         $player->sendMessage(TextFormat::GREEN . "Your nick " . ($m = !$nick ? "has been removed" : "is now " . TextFormat::RESET . $nick));
         if($player !== $sender){
-            $sender->sendMessage(TextFormat::GREEN . $player->getName() . (substr($player->getName(), -1, 1) === "s" ? "'" : "'s") . " nick " . $m);
+            $sender->sendMessage(TextFormat::GREEN . $player->getName() . (str_ends_with($player->getName(), "s") ? "'" : "'s") . " nick " . $m);
         }
         return true;
     }

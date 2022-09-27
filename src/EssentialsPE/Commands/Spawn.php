@@ -7,8 +7,8 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\level\Location;
-use pocketmine\Player;
+use pocketmine\entity\Location;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class Spawn extends BaseCommand{
@@ -44,7 +44,7 @@ class Spawn extends BaseCommand{
                 return false;
             }
         }
-        $player->teleport(Location::fromObject($this->getAPI()->getServer()->getDefaultLevel()->getSpawnLocation(), $this->getAPI()->getServer()->getDefaultLevel()));
+        $player->teleport(Location::fromObject($this->getAPI()->getServer()->getWorldManager()->getDefaultWorld()->getSpawnLocation(), $this->getAPI()->getServer()->getWorldManager()->getDefaultWorld()));
         $player->sendMessage(TextFormat::GREEN . "Teleporting...");
         return true;
     }

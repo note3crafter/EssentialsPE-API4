@@ -7,7 +7,7 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class World extends BaseCommand{
@@ -37,17 +37,17 @@ class World extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport to this world.");
             return false;
         }
-        if(!$sender->getServer()->isLevelGenerated($args[0])){
+        if(!$sender->getServer()->getWorldManager()->isWorldGenerated($args[0])){
             $sender->sendMessage(TextFormat::RED . "[Error] World doesn't exist");
             return false;
-        }elseif(!$sender->getServer()->isLevelLoaded($args[0])){
+        }elseif(!$sender->getServer()->getWorldManager()->isWorldLoaded($args[0])){
             $sender->sendMessage(TextFormat::YELLOW . "Level is not loaded yet. Loading...");
-            if(!$sender->getServer()->loadLevel($args[0])){
+            if(!$sender->getServer()->getWorldManager()->loadWorld($args[0])){
                 $sender->sendMessage(TextFormat::RED . "[Error] The level couldn't be loaded");
                 return false;
             }
         }
-        $sender->teleport($this->getAPI()->getServer()->getLevelByName($args[0])->getSpawnLocation(), 0, 0);
+        $sender->teleport($this->getAPI()->getServer()->getWorldManager()->getWorldByName($args[0])->getSpawnLocation(), 0, 0);
         $sender->sendMessage(TextFormat::YELLOW . "Teleporting...");
         return true;
     }

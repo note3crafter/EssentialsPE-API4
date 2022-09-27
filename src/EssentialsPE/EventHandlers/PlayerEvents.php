@@ -7,7 +7,6 @@ namespace EssentialsPE\EventHandlers;
 use EssentialsPE\BaseFiles\BaseEventHandler;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\event\entity\EntityLevelChangeEvent;
 use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\player\PlayerBedEnterEvent;
 use pocketmine\event\player\PlayerChatEvent;
@@ -17,9 +16,7 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
-use pocketmine\lang\TextContainer;
-use pocketmine\lang\TranslationContainer;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class PlayerEvents extends BaseEventHandler{
@@ -98,13 +95,13 @@ class PlayerEvents extends BaseEventHandler{
             if($event->getPlayer()->hasPermission("essentials.mute.exempt")){
                 $this->getAPI()->setMute($event->getPlayer(), false, null, false);
             }elseif(($t = $this->getAPI()->getMutedUntil($event->getPlayer())) === null){
-                $event->setCancelled(true);
+                $event->cancel();
             }else{
                 $t2 = new \DateTime();
                 if($t < $t2){
                     $this->getAPI()->setMute($event->getPlayer(), false, null, false);
                 }else{
-                    $event->setCancelled(true);
+                    $event->cancel();
                 }
             }
         }elseif($this->getAPI()->isAFK($event->getPlayer())){
@@ -118,7 +115,7 @@ class PlayerEvents extends BaseEventHandler{
     public function onPlayerCommand(PlayerCommandPreprocessEvent $event): void{
         $command = $this->getAPI()->colorMessage($event->getMessage(), $event->getPlayer());
         if($command === false){
-            $event->setCancelled(true);
+            $event->cancel();
         }
         $event->setMessage($command);
     }
@@ -175,7 +172,7 @@ class PlayerEvents extends BaseEventHandler{
         $victim = $event->getEntity();
         if($victim instanceof Player){
             if($this->getAPI()->isGod($victim) || ($this->getAPI()->isAFK($victim) && $this->getPlugin()->getConfig()->getNested("afk.safe"))){
-                $event->setCancelled(true);
+                $event->cancel();
             }
 
             if($event instanceof EntityDamageByEntityEvent){
@@ -183,15 +180,15 @@ class PlayerEvents extends BaseEventHandler{
                 if($issuer instanceof Player){
                     if(!($s = $this->getAPI()->isPvPEnabled($issuer)) || !$this->getAPI()->isPvPEnabled($victim)){
                         $issuer->sendMessage(TextFormat::RED . (!$s ? "You have" : $victim->getDisplayName() . " has") . " PvP disabled!");
-                        $event->setCancelled(true);
+                        $event->cancel();
                     }
 
                     if($this->getAPI()->isGod($issuer) && !$issuer->hasPermission("essentials.god.pvp")){
-                        $event->setCancelled(true);
+                        $event->cancel();
                     }
 
                     if($this->getAPI()->isVanished($issuer) && !$issuer->hasPermission("essentials.vanish.pvp")){
-                        $event->setCancelled(true);
+                        $event->cancel();
                     }
                 }
             }

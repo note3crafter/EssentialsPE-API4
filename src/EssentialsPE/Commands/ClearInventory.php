@@ -7,7 +7,8 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\GameMode;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class ClearInventory extends BaseCommand{
@@ -43,15 +44,15 @@ class ClearInventory extends BaseCommand{
                 return false;
             }
         }
-        if(($gm = $player->getGamemode()) === Player::SPECTATOR){
-            $sender->sendMessage(TextFormat::RED . "[Error] " . (isset($args[0]) ? $player->getDisplayName() . "is" : "You are") . " in " . $this->getAPI()->getServer()->getGamemodeString($gm) . " mode");
+        if(($gm = $player->getGamemode()) === GameMode::SPECTATOR()){
+            $sender->sendMessage(TextFormat::RED . "[Error] " . (isset($args[0]) ? $player->getDisplayName() . "is" : "You are") . " in " . $player->getGamemode() . " mode");
             return false;
         }
         $player->getInventory()->clearAll();
         $player->getArmorInventory()->clearAll();
         $player->sendMessage(TextFormat::AQUA . "Your inventory was cleared");
         if($player !== $sender){
-            $sender->sendMessage(TextFormat::AQUA . $player->getDisplayName() . (substr($player->getDisplayName(), -1, 1) === "s" ? "'" : "'s") . " inventory was cleared");
+            $sender->sendMessage(TextFormat::AQUA . $player->getDisplayName() . (str_ends_with($player->getDisplayName(), "s") ? "'" : "'s") . " inventory was cleared");
         }
         return true;
     }

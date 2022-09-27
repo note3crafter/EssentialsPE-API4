@@ -7,7 +7,7 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class SetSpawn extends BaseCommand{
@@ -33,10 +33,10 @@ class SetSpawn extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $sender->getLevel()->setSpawnLocation($sender);
-        $sender->getServer()->setDefaultLevel($sender->getLevel());
+        $sender->getWorld()->setSpawnLocation($sender);
+        $sender->getServer()->getWorldManager()->setDefaultWorld($sender->getWorld());
         $sender->sendMessage(TextFormat::YELLOW . "Server's spawn point changed!");
-        $this->getAPI()->getServer()->getLogger()->info(TextFormat::YELLOW . "Server's spawn point set to " . TextFormat::AQUA . $sender->getLevel()->getName() . TextFormat::YELLOW . " by " . TextFormat::GREEN . $sender->getName());
+        $this->getAPI()->getServer()->getLogger()->info(TextFormat::YELLOW . "Server's spawn point set to " . TextFormat::AQUA . $sender->getWorld()->getFolderName() . TextFormat::YELLOW . " by " . TextFormat::GREEN . $sender->getName());
         return true;
     }
 }

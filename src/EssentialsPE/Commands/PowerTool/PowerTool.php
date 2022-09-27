@@ -7,8 +7,8 @@ namespace EssentialsPE\Commands\PowerTool;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\item\Item;
-use pocketmine\Player;
+use pocketmine\item\ItemIds;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class PowerTool extends BaseCommand{
@@ -35,7 +35,7 @@ class PowerTool extends BaseCommand{
             return false;
         }
         $item = $sender->getInventory()->getItemInHand();
-        if($item->getId() === Item::AIR){
+        if($item->getId() === ItemIds::AIR){
             $sender->sendMessage(TextFormat::RED . "You can't assign a command to an empty hand.");
             return false;
         }

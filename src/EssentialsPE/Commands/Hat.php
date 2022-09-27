@@ -7,8 +7,9 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\item\Item;
-use pocketmine\Player;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class Hat extends BaseCommand{
@@ -44,22 +45,22 @@ class Hat extends BaseCommand{
                 return false;
             }
         }
-        $new = Item::get(Item::AIR);
-        $old = $sender->getInventory()->getHelmet();
+        $new = ItemFactory::getInstance()->get(ItemIds::AIR);
+        $old = $sender->getArmorInventory()->getHelmet();
         $slot = $sender->getInventory()->canAddItem($old) ? $sender->getInventory()->firstEmpty() : null;
         if(!$remove){
             $new = $sender->getInventory()->getItemInHand();
-            if($new->getId() === Item::AIR){
+            if($new->getId() === ItemIds::AIR){
                 $sender->sendMessage(TextFormat::RED . "[Error] Please specify an item to wear");
                 return false;
             }
-            $slot = $sender->getInventory()->getHeldItemSlot();
+            $slot = $sender->getArmorInventory()->getHelmet();
         }
-        $sender->getInventory()->setHelmet($new);
+        $sender->getArmorInventory()->setHelmet($new);
         if($slot !== null){
             $sender->getInventory()->setItem($slot, $old);
         }
-        $sender->sendMessage(TextFormat::AQUA . ($new->getId() === Item::AIR ? "Hat removed!" : "You got a new hat!"));
+        $sender->sendMessage(TextFormat::AQUA . ($new->getId() === ItemIds::AIR ? "Hat removed!" : "You got a new hat!"));
         return true;
     }
 }

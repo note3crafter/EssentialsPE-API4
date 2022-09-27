@@ -6,8 +6,10 @@ namespace EssentialsPE\Commands\Override;
 
 use EssentialsPE\BaseFiles\BaseAPI;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use pocketmine\player\GameMode as GM;
+
 
 class Gamemode extends BaseOverrideCommand{
     /**
@@ -36,20 +38,20 @@ class Gamemode extends BaseOverrideCommand{
             switch(strtolower($alias)){
                 case "survival":
                 case "gms":
-                    $args[0] = Player::SURVIVAL;
+                    $args[0] = GM::SURVIVAL();
                     break;
                 case "creative":
                 case "gmc":
-                    $args[0] = Player::CREATIVE;
+                    $args[0] = GM::CREATIVE();
                     break;
                 case "adventure":
                 case "gma":
-                    $args[0] = Player::ADVENTURE;
+                    $args[0] = GM::ADVENTURE();
                     break;
                 case "spectator":
                 case "viewer":
                 case "gmt":
-                    $args[0] = Player::SPECTATOR;
+                    $args[0] = GM::SPECTATOR();
                     break;
                 default:
                     return false;
@@ -75,10 +77,10 @@ class Gamemode extends BaseOverrideCommand{
          */
         if(is_numeric($args[0])){
             switch($args[0]){
-                case Player::SURVIVAL:
-                case Player::CREATIVE:
-                case Player::ADVENTURE:
-                case Player::SPECTATOR:
+                case GM::SURVIVAL():
+                case GM::CREATIVE():
+                case GM::ADVENTURE():
+                case GM::SPECTATOR():
                     $gm = (int)$args[0];
                     break;
                 default:
@@ -90,22 +92,22 @@ class Gamemode extends BaseOverrideCommand{
             switch(strtolower($args[0])){
                 case "survival":
                 case "s":
-                    $gm = Player::SURVIVAL;
+                    $gm = GM::SURVIVAL();
                     break;
                 case "creative":
                 case "c":
-                    $gm = Player::CREATIVE;
+                    $gm = GM::CREATIVE();
                     break;
                 case "adventure":
                 case "a":
-                    $gm = Player::ADVENTURE;
+                    $gm = GM::ADVENTURE();
                     break;
                 case "spectator":
                 case "viewer":
                 case "view":
                 case "v":
                 case "t":
-                    $gm = Player::SPECTATOR;
+                    $gm = GM::SPECTATOR();
                     break;
                 default:
                     $sender->sendMessage(TextFormat::RED . "[Error] Please specify a valid gamemode");
@@ -113,15 +115,14 @@ class Gamemode extends BaseOverrideCommand{
                     break;
             }
         }
-        $gmString = $this->getAPI()->getServer()->getGamemodeString($gm);
         if($player->getGamemode() === $gm){
             $sender->sendMessage(TextFormat::RED . "[Error] " . ($player === $sender ? "You're" : $player->getDisplayName() . " is") . " already in " . $gmString);
             return false;
         }
         $player->setGamemode($gm);
-        $player->sendMessage(TextFormat::YELLOW . "You're now in " . $gmString);
+        $player->sendMessage(TextFormat::YELLOW . "You're now in " . $args[0]);
         if($player !== $sender){
-            $sender->sendMessage(TextFormat::GREEN . $player->getDisplayName() . " is now in " . $gmString);
+            $sender->sendMessage(TextFormat::GREEN . $player->getDisplayName() . " is now in " . $args[0]);
         }
         return true;
     }

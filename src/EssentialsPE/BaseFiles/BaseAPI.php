@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace EssentialsPE\BaseFiles;
 
+use EssentialsPE\Commands\World;
 use EssentialsPE\Events\PlayerAFKModeChangeEvent;
 use EssentialsPE\Events\PlayerFlyModeChangeEvent;
 use EssentialsPE\Events\PlayerGodModeChangeEvent;
@@ -18,23 +19,22 @@ use EssentialsPE\Tasks\AFK\AFKKickTask;
 use EssentialsPE\Tasks\AFK\AFKSetterTask;
 use EssentialsPE\Tasks\GeoLocation;
 use EssentialsPE\Tasks\TPRequestTask;
-use pocketmine\block\Block;
+use pocketmine\block\BlockIdentifier;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\command\CommandSender;
-use pocketmine\entity\Effect;
-use pocketmine\entity\EffectInstance;
+use pocketmine\data\bedrock\EffectIds;
+use pocketmine\entity\effect\EffectInstance;
 use pocketmine\entity\Entity;
+use pocketmine\entity\Location;
 use pocketmine\entity\object\PrimedTNT;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\inventory\BaseInventory;
-use pocketmine\IPlayer;
 use pocketmine\item\Armor;
 use pocketmine\item\Item;
 use pocketmine\item\ItemBlock;
 use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 use pocketmine\item\Tool;
-use pocketmine\level\Level;
-use pocketmine\level\Location;
-use pocketmine\level\Position;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\ByteTag;
@@ -42,16 +42,19 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\DoubleTag;
 use pocketmine\nbt\tag\FloatTag;
 use pocketmine\nbt\tag\ListTag;
+use pocketmine\network\mcpe\protocol\AddActorPacket;
 use pocketmine\network\mcpe\protocol\AddEntityPacket;
 use pocketmine\network\mcpe\protocol\MobEffectPacket;
 use pocketmine\network\mcpe\protocol\SetTimePacket;
-use pocketmine\OfflinePlayer;
 use pocketmine\permission\Permission;
-use pocketmine\Player;
+use pocketmine\player\IPlayer;
+use pocketmine\player\OfflinePlayer;
+use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\Config;
 use pocketmine\utils\Random;
 use pocketmine\utils\TextFormat;
+use pocketmine\world\Position;
 
 class BaseAPI{
     /** @var Loader */
@@ -97,12 +100,12 @@ class BaseAPI{
         return self::$instance;
     }
 
-    private final function saveConfigs(): void{
+    private function saveConfigs(): void{
         $this->loadWarps();
         $this->updateHomesAndNicks();
     }
 
-    private final function updateHomesAndNicks(): void{
+    private function updateHomesAndNicks(): void{
         if(file_exists($f = $this->getEssentialsPEPlugin()->getDataFolder() . "Homes.yml")){
             $cfg = new Config($f, Config::YAML);
             foreach($cfg->getAll() as $player => $home){
@@ -128,19 +131,19 @@ class BaseAPI{
         }
     }
 
-    private final function loadWarps(): void{
+    private function loadWarps(): void{
         $parent = new Permission("essentials.warps", null, null);
         $this->getServer()->getPluginManager()->addPermission($parent);
 
         $cfg = new Config($this->getEssentialsPEPlugin()->getDataFolder() . "Warps.yml", Config::YAML);
         foreach($cfg->getAll() as $n => $v){
-            if($this->getServer()->isLevelGenerated($v[3])){
-                if(!$this->getServer()->isLevelLoaded($v[3])){
-                    $this->getServer()->loadLevel($v[3]);
+            if($this->getServer()->getWorldManager()->isWorldGenerated($v[3])){
+                if(!$this->getServer()->getWorldManager()->isWorldLoaded($v[3])){
+                    $this->getServer()->getWorldManager()->loadWorld($v[3]);
                 }
-                $this->warps[$n] = new BaseLocation($n, (int) $v[0], (int) $v[1], (int) $v[2], $this->getServer()->getLevelByName($v[3]), $v[4] ?? 0.0, $v[5] ?? 0.0);
+                $this->warps[$n] = new BaseLocation($n, (int) $v[0], (int) $v[1], (int) $v[2], $this->getServer()->getWorldManager()->getWorldByName($v[3]), $v[4] ?? 0.0, $v[5] ?? 0.0);
                 $child = new Permission("essentials.warps." . $n, null, null);
-                $child->addParent($parent, false);
+                $child->addChild($parent, false);
                 $this->getServer()->getPluginManager()->addPermission($child);
             }
         }
@@ -149,7 +152,7 @@ class BaseAPI{
     /**
      * @param bool $save
      */
-    private final function encodeWarps(bool $save = false): void{
+    private function encodeWarps(bool $save = false): void{
         $warps = [];
         foreach($this->warps as $name => $object){
             if($object instanceof BaseLocation){
@@ -185,9 +188,9 @@ class BaseAPI{
      *
      */
 
-    const NON_SOLID_BLOCKS = [Block::SAPLING, Block::WATER, Block::STILL_WATER, Block::LAVA, Block::STILL_LAVA, Block::COBWEB, Block::TALL_GRASS, Block::DEAD_BUSH, Block::DANDELION,
-        Block::POPPY, Block::BROWN_MUSHROOM, Block::RED_MUSHROOM, Block::TORCH, Block::FIRE, Block::WHEAT_BLOCK, Block::SIGN_POST, Block::WALL_SIGN, Block::SUGARCANE_BLOCK,
-        Block::PUMPKIN_STEM, Block::MELON_STEM, Block::VINE, Block::CARROT_BLOCK, Block::POTATO_BLOCK, Block::DOUBLE_PLANT];
+    const NON_SOLID_BLOCKS = [BlockLegacyIds::SAPLING, BlockLegacyIds::WATER, BlockLegacyIds::STILL_WATER, BlockLegacyIds::LAVA, BlockLegacyIds::STILL_LAVA, BlockLegacyIds::COBWEB, BlockLegacyIds::TALL_GRASS, BlockLegacyIds::DEAD_BUSH, BlockLegacyIds::DANDELION,
+        BlockLegacyIds::POPPY, BlockLegacyIds::BROWN_MUSHROOM, BlockLegacyIds::RED_MUSHROOM, BlockLegacyIds::TORCH, BlockLegacyIds::FIRE, BlockLegacyIds::WHEAT_BLOCK, BlockLegacyIds::SIGN_POST, BlockLegacyIds::WALL_SIGN, BlockLegacyIds::SUGARCANE_BLOCK,
+        BlockLegacyIds::PUMPKIN_STEM, BlockLegacyIds::MELON_STEM, BlockLegacyIds::VINE, BlockLegacyIds::CARROT_BLOCK, BlockLegacyIds::POTATO_BLOCK, BlockLegacyIds::DOUBLE_PLANT];
 
     /**
      *            ______ _  __
@@ -351,7 +354,7 @@ class BaseAPI{
         if($block === null){
             return false;
         }
-        $this->createTNT($block->add(0, 1), $player->getLevel());
+        $this->createTNT($block->getPosition()->add(0, 1, 0), $player->getWorld());
         return true;
     }
 
@@ -363,7 +366,7 @@ class BaseAPI{
     public function nuke(Player $player): void{
         for($x = -10; $x <= 10; $x += 5){
             for($z = -10; $z <= 10; $z += 5){
-                $this->createTNT($player->add($x, 0, $z), $player->getLevel());
+                $this->createTNT($player->getPosition()->add($x, 0, $z), $player->getWorld());
             }
         }
     }
@@ -371,15 +374,15 @@ class BaseAPI{
     /**
      * @param string $type
      * @param Vector3 $pos
-     * @param Level|null $level
+     * @param \pocketmine\world\World|null $level
      * @param CompoundTag|null $nbt
      *
      * @return null|Entity
      */
-    public function createEntity(string $type, Vector3 $pos, Level $level = null, CompoundTag $nbt = null): ?Entity{
+    public function createEntity(string $type, Vector3 $pos, \pocketmine\world\World $level = null, CompoundTag $nbt = null): ?Entity{
         if($level === null){
             if($pos instanceof Position){
-                $level = $pos->getLevel();
+                $level = $pos->getWorld();
             }else{
                 return null;
             }
@@ -399,12 +402,12 @@ class BaseAPI{
 
     /**
      * @param Vector3|Position $pos
-     * @param null|Level $level
+     * @param null|\pocketmine\world\World $level
      * @param bool $spawn
      *
      * @return null|PrimedTNT
      */
-    public function createTNT(Vector3 $pos, Level $level = null, $spawn = true): ?PrimedTNT{
+    public function createTNT(Vector3 $pos, \pocketmine\world\World $level = null, $spawn = true): ?PrimedTNT{
         $mot = (new Random())->nextSignedFloat() * M_PI * 2;
         $entity = $this->createEntity("PrimedTNT", $pos, $level, new CompoundTag("EssPE", [
             "Pos" => new ListTag("Pos", [
@@ -438,13 +441,13 @@ class BaseAPI{
      */
     public function strikeLightning(Position $pos, int $damage = 0): void{
         $pk = $this->lightning($pos);
-        foreach($pos->getLevel()->getPlayers() as $p){
-            $p->dataPacket($pk);
+        foreach($pos->getWorld()->getPlayers() as $p){
+            $p->sendData($pk);
         }
         if(!$pos instanceof Entity and !($pos = $this->createTNT($pos, null, false))){
             return;
         }
-        foreach($pos->getLevel()->getNearbyEntities(new AxisAlignedBB($pos->getFloorX() - ($radius = 5), $pos->getFloorY() - $radius, $pos->getFloorZ() - $radius, $pos->getFloorX() + $radius, $pos->getFloorY() + $radius, $pos->getFloorZ() + $radius), $pos) as $e){
+        foreach($pos->getWorld()->getNearbyEntities(new AxisAlignedBB($pos->getFloorX() - ($radius = 5), $pos->getFloorY() - $radius, $pos->getFloorZ() - $radius, $pos->getFloorX() + $radius, $pos->getFloorY() + $radius, $pos->getFloorZ() + $radius), $pos) as $e){
             $e->attack(new EntityDamageEvent($pos, EntityDamageEvent::CAUSE_MAGIC, $damage));
         }
     }
@@ -461,7 +464,7 @@ class BaseAPI{
         if($this->lightningPacket === null){
             $pk = new AddEntityPacket();
             $pk->type = 93;
-            $pk->entityRuntimeId = Entity::$entityCount++;
+            //$pk->entityRuntimeId = Entity::$entityCount++;
             $pk->metadata = [];
             $motion = new Vector3(0, 0, 0);
             $pk->motion = $motion;
@@ -655,7 +658,7 @@ class BaseAPI{
      * @return bool
      */
     public function setHome(Player $player, string $home, Position $pos, float $yaw = 0.0, float $pitch = 0.0): bool{
-        return $this->getSession($player)->setHome($home, ($pos instanceof Location ? $pos : Location::fromObject($pos, $pos->getLevel(), $yaw, $pitch)));
+        return $this->getSession($player)->setHome($home, ($pos instanceof Location ? $pos : Location::fromObject($pos, $pos->getWorld(), $yaw, $pitch)));
     }
 
     /**
@@ -695,10 +698,10 @@ class BaseAPI{
 	 *      '1:1' - or - 'stone:1'
 	 *
 	 * @param string $item_name
-	 * @return Item|ItemBlock
+	 * @return ItemIds
 	 * @throws \ReflectionException
 	 */
-    public function getItem(string $item_name): Item{
+    public function getItem(string $item_name): ItemIds{
         if(strpos($item_name, ":") !== false){
             $v = explode(":", $item_name);
             $item_name = $v[0];
@@ -709,11 +712,11 @@ class BaseAPI{
 
         if(!is_numeric($item_name)){
             $item = Item::fromString($item_name);
-	        if(strtolower($item_name) !== "air" && $item->getId() === Item::AIR) {
+	        if(strtolower($item_name) !== "air" && $item->getId() === ItemIds::AIR) {
 		        $item = $this->readableNameToItem($item_name);
 	        }
         }else{
-            $item = Item::get($item_name);
+            $item = ItemFactory::getInstance()->get($item_name);
         }
         $item->setDamage($damage);
 
@@ -755,9 +758,9 @@ class BaseAPI{
 		$itemClass = new \ReflectionClass("pocketmine\\item\\Item");
 		$itemConstant = strtoupper(str_replace(" ", "_", $item_name));
 		if($itemClass->hasConstant($itemConstant)) {
-			return Item::get($itemClass->getConstant($itemConstant));
+			return ItemFactory::getInstance()->get($itemClass->getConstant($itemConstant));
 		}
-		return Item::get(Item::AIR);
+		return ItemFactory::getInstance()->get(ItemIds::AIR);
 	}
 
     /**
@@ -783,7 +786,7 @@ class BaseAPI{
         if($target !== null && !$this->canBeCondensed($target)){
             return false;
         }
-        $replace = Item::get(0);
+        $replace = ItemFactory::getInstance()->get(0);
         // First step: Merge target items...
         /**
          * @var int $slot
@@ -823,7 +826,7 @@ class BaseAPI{
     /** @var array */
     private $condenseShapes = [
         [], // 2x2 Shapes TODO
-        [Item::COAL => Item::COAL_BLOCK, Item::IRON_INGOT => Item::IRON_BLOCK, Item::GOLD_INGOT => Item::GOLD_BLOCK, Item::DIAMOND => Item::DIAMOND_BLOCK, Item::EMERALD => Item::EMERALD_BLOCK] // 3x3 Shapes
+        [ItemIds::COAL => ItemIds::COAL_BLOCK, ItemIds::IRON_INGOT => ItemIds::IRON_BLOCK, ItemIds::GOLD_INGOT => ItemIds::GOLD_BLOCK, ItemIds::DIAMOND => ItemIds::DIAMOND_BLOCK, ItemIds::EMERALD => ItemIds::EMERALD_BLOCK] // 3x3 Shapes
     ];
 
     /**
@@ -852,8 +855,8 @@ class BaseAPI{
         if($count < 1){
             return null;
         }
-        $condensed = ItemFactory::get($newId, $damage, (int) $count);
-        if($condensed->getId() === Item::AIR){
+        $condensed = ItemFactory::getInstance()->get($newId, $damage, (int) $count);
+        if($condensed->getId() === ItemIds::AIR){
             return null;
         }
         $item->setCount($item->getCount() - ($count * $shape));
@@ -1164,7 +1167,7 @@ class BaseAPI{
         }
         // If cannot get the exact player name/nick, try with portions of it
         if(!$found){
-            $found = ($f = $this->getServer()->getPlayer($player)) === null ? null : $f; // PocketMine function to get from portions of name
+            $found = ($f = $this->getServer()->getPlayerExact($player)) === null ? null : $f; // PocketMine function to get from portions of name
         }
         /*
          * Copy from PocketMine's function (use above xD) but modified to work with Nicknames :P
@@ -1223,7 +1226,7 @@ class BaseAPI{
         }
         /** @var Player[] $players */
         $players = [];
-        foreach($player->getLevel()->getNearbyEntities(new AxisAlignedBB($player->getFloorX() - $radius, $player->getFloorY() - $radius, $player->getFloorZ() - $radius, $player->getFloorX() + $radius, $player->getFloorY() + $radius, $player->getFloorZ() + $radius), $player) as $e){
+        foreach($player->getWorld()->getNearbyEntities(new AxisAlignedBB($player->getPosition()->getFloorX() - $radius, $player->getPosition()->getFloorY() - $radius, $player->getPosition()->getFloorZ() - $radius, $player->getPosition()->getFloorX() + $radius, $player->getPosition()->getFloorY() + $radius, $player->getPosition()->getFloorZ() + $radius), $player) as $e){
             if($e instanceof Player){
                 $players[] = $e;
             }
@@ -1289,7 +1292,7 @@ class BaseAPI{
             }
         }
         if($chat = $this->getPowerToolItemChatMacro($player, $item) !== null){
-            $this->getServer()->broadcast("<" . $player->getDisplayName() . "> " . TextFormat::RESET . $this->getPowerToolItemChatMacro($player, $item), Server::BROADCAST_CHANNEL_USERS);
+            $this->getServer()->broadcastMessage("<" . $player->getDisplayName() . "> " . TextFormat::RESET . $this->getPowerToolItemChatMacro($player, $item), Server::BROADCAST_CHANNEL_USERS);
         }
         if($command === false && $chat === false){
             return false;
@@ -1606,7 +1609,7 @@ class BaseAPI{
         $pk->time = $time;
         $pk->encode();
         $pk->isEncoded = true;
-        $player->dataPacket($pk);
+        $player->sendData($pk);
         if(isset($pk->__encapsulatedPacket)){
             unset($pk->__encapsulatedPacket);
         }
@@ -1900,7 +1903,7 @@ class BaseAPI{
      */
     public function setVanish(Player $player, bool $state, bool $noPacket = false): bool{
         if($this->invisibilityEffect === null){
-            $effect = new EffectInstance(Effect::getEffect(Effect::INVISIBILITY), INT32_MAX, 0, false);
+            $effect = new EffectInstance(EffectIds::INVISIBILITY, 2147483647, 0, false);
             $this->invisibilityEffect = $effect;
         }
         $this->getServer()->getPluginManager()->callEvent($ev = new PlayerVanishEvent($this, $player, $state, $noPacket));
@@ -1908,11 +1911,12 @@ class BaseAPI{
             return false;
         }
         $state = $ev->willVanish();
+
         $player->setDataFlag(Entity::DATA_FLAGS, Entity::DATA_FLAG_INVISIBLE, $state);
         $player->setNameTagVisible(!$state);
         /** @var Player[] $pl */
         $pl = [];
-        foreach($player->getLevel()->getPlayers() as $p){
+        foreach($player->getWorld()->getPlayers() as $p){
             if($state || (!$state && !in_array($p->getName(), $ev->getHiddenFor(), true))){
                 $pl[] = $p;
             }
@@ -1926,17 +1930,17 @@ class BaseAPI{
                 $pk = new MobEffectPacket();
                 $pk->entityRuntimeId = $player->getId();
                 $pk->eventId = MobEffectPacket::EVENT_REMOVE;
-                $pk->effectId = $this->invisibilityEffect->getId();
+                $pk->effectId = $this->invisibilityEffect->getType();
             }else{
                 $pk = new MobEffectPacket();
                 $pk->entityRuntimeId = $player->getId();
-                $pk->effectId = $this->invisibilityEffect->getId();
+                $pk->effectId = $this->invisibilityEffect->getType();
                 $pk->amplifier = $this->invisibilityEffect->getAmplifier();
                 $pk->particles = $this->invisibilityEffect->isVisible();
                 $pk->duration = $this->invisibilityEffect->getDuration();
                 $pk->eventId = MobEffectPacket::EVENT_ADD;
             }
-            $this->getServer()->broadcastPacket($pl, $pk);
+            $this->getServer()->broadcastPackets($pl, $pk);
         }else{
             if(!$state){
                 foreach($pl as $p){
@@ -1972,7 +1976,7 @@ class BaseAPI{
      * @param Level $origin
      * @param Level $target
      */
-    public function switchLevelVanish(Player $player, Level $origin, Level $target): void{
+    public function switchLevelVanish(Player $player, \pocketmine\world\World $origin, \pocketmine\world\World $target): void{
         if($origin !== $target && $this->isVanished($player)){
 
             // This will be used if the specified player has "noPacket" enabled.
@@ -2001,7 +2005,7 @@ class BaseAPI{
                     if($this->isVanished($p)){
                         if(!$this->hasNoPacket($p)){
                             $pk->entityRuntimeId = $p->getId();
-                            $player->dataPacket($pk);
+                            $player->sendData($pk);
                         }else{
                             $player->showPlayer($p);
                         }
@@ -2023,7 +2027,7 @@ class BaseAPI{
                     if($this->isVanished($p)){
                         if(!$this->hasNoPacket($p)){
                             $pk->entityRuntimeId = $p->getId();
-                            $player->dataPacket($pk);
+                            $player->sendData($pk);
                         }else{
                             $player->hidePlayer($p);
                         }
@@ -2080,7 +2084,7 @@ class BaseAPI{
         if(!$this->validateName($warp, false)){
             return false;
         }
-        $this->warps[$warp] = $pos instanceof BaseLocation ? $pos : BaseLocation::fromPosition($warp, ($pos instanceof Location ? $pos : Location::fromObject($pos, $pos->getLevel(), $yaw, $pitch)));
+        $this->warps[$warp] = $pos instanceof BaseLocation ? $pos : BaseLocation::fromPosition($warp, ($pos instanceof Location ? $pos : Location::fromObject($pos, $pos->getWorld(), $yaw, $pitch)));
         return true;
     }
 

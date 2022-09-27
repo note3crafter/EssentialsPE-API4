@@ -7,8 +7,9 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\item\Item;
-use pocketmine\Player;
+use pocketmine\item\ItemIds;
+use pocketmine\player\GameMode;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class ItemCommand extends BaseCommand{
@@ -34,15 +35,15 @@ class ItemCommand extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(($gm = $sender->getGamemode()) === Player::SPECTATOR){
-            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getAPI()->getServer()->getGamemodeString($gm) . " mode");
+        if(($sender->getGamemode()) === GameMode::ADVENTURE()){
+            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $sender->getGamemode() . " mode");
             return false;
         }
 
         //Getting the item...
         $item = $this->getAPI()->getItem($item_name = array_shift($args));
 
-        if($item->getId() === Item::AIR){
+        if($item->getId() === ItemIds::AIR){
             $sender->sendMessage(TextFormat::RED . "Unknown item \"" . $item_name . "\"");
             return false;
         }elseif(!$sender->hasPermission("essentials.itemspawn.item-all") && !$sender->hasPermission("essentials.itemspawn.item-" . $item->getName() && !$sender->hasPermission("essentials.itemspawn.item-" . $item->getId()))){

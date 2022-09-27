@@ -6,7 +6,7 @@ namespace EssentialsPE\Events;
 
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCustomEvent;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class SessionCreateEvent extends BaseCustomEvent{
     public static $handlerList = null;

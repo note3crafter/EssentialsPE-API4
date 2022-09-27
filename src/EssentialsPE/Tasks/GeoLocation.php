@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace EssentialsPE\Tasks;
 
 use EssentialsPE\Loader;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use pocketmine\utils\Utils;
@@ -27,7 +27,7 @@ class GeoLocation extends AsyncTask{
             foreach($player as $p){
                 $spl = spl_object_hash($p);
                 $this->player[$spl] = $p;
-                $this->ip[$spl] = $p->getAddress();
+                $this->ip[$spl] = $p->getNetworkSession()->getIp();
             }
         }
     }

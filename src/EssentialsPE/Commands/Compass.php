@@ -7,7 +7,7 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class Compass extends BaseCommand{
@@ -33,7 +33,7 @@ class Compass extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        switch($sender->getDirection()){
+        switch($sender->getDirectionPlane()){
             case 0:
                 $direction = "south";
                 break;

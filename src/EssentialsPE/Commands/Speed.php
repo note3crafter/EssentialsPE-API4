@@ -7,8 +7,9 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\entity\Effect;
-use pocketmine\Player;
+use pocketmine\entity\effect\EffectInstance;
+use pocketmine\entity\effect\VanillaEffects;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
 class Speed extends BaseCommand{
@@ -42,13 +43,13 @@ class Speed extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }
-        if((int) $args[0] === 0){
-            $player->removeEffect(Effect::SPEED);
-        }else{
-            $effect = Effect::getEffect(Effect::SPEED);
-            $effect->setAmplifier($args[0]);
-            $effect->setDuration(PHP_INT_MAX);
-            $player->addEffect($effect);
+        if((int) $args[0] === 0) {
+            $player->getEffects()->remove(VanillaEffects::SPEED());
+        } elseif ((int)$args[0] > 255) {
+            $player->sendMessage(TextFormat::RED . "[Error] Use /speed [0-255]");
+            return false;
+        } else {
+            $player->getEffects()->add(new EffectInstance(VanillaEffects::SPEED(), (2147483647), ($args[0]), false));
         }
         $sender->sendMessage(TextFormat::YELLOW . "Speed amplified by " . TextFormat::WHITE . $args[0]);
         return true;
